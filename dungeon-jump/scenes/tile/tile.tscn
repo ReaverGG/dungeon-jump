@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://c27x6bnodca5r"]
+
+[ext_resource type="Script" uid="uid://7q6kxgr5vmli" path="res://code/tile.gd" id="1_dvver"]
+[ext_resource type="Texture2D" uid="uid://bwxw3j1rl85dp" path="res://assets/tiles/normal.png" id="1_vb0sl"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_be64o"]
+size = Vector2(240, 50)
+
+[node name="Tile" type="AnimatableBody2D" unique_id=140536108 node_paths=PackedStringArray("sprite")]
+script = ExtResource("1_dvver")
+sprite = NodePath("Sprite")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=2058601011]
+position = Vector2(0, 2.3841858e-07)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("1_vb0sl")
+offset = Vector2(0, 21.81)
+
+[node name="Collider" type="CollisionShape2D" parent="." unique_id=788378475]
+shape = SubResource("RectangleShape2D_be64o")
+one_way_collision = true

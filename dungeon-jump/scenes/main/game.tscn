@@ -1,0 +1,85 @@
+[gd_scene format=3 uid="uid://cjwmmfqh4vdux"]
+
+[ext_resource type="Texture2D" uid="uid://4jjjae46fyqc" path="res://assets/bg/bricks.png" id="1_e64el"]
+[ext_resource type="Script" uid="uid://dbdib3ympo6ej" path="res://code/background.gd" id="2_ma5rq"]
+[ext_resource type="Texture2D" uid="uid://cj0bncwuxn1jm" path="res://assets/bg/sand.png" id="3_e3dby"]
+[ext_resource type="PackedScene" uid="uid://dvb7cmxi2ci7k" path="res://scenes/player/player.tscn" id="5_gf1f2"]
+[ext_resource type="Script" uid="uid://gf86tvcyvy30" path="res://code/camera.gd" id="5_obhq2"]
+[ext_resource type="Script" uid="uid://dv2kap2ufe0tk" path="res://code/spawner.gd" id="6_0rn35"]
+[ext_resource type="PackedScene" uid="uid://c27x6bnodca5r" path="res://scenes/tile/tile.tscn" id="6_em1bs"]
+[ext_resource type="FontFile" uid="uid://cveiw0xq6nwlq" path="res://assets/font/archivo_black.ttf" id="6_oxav3"]
+[ext_resource type="Texture2D" uid="uid://bwxw3j1rl85dp" path="res://assets/tiles/normal.png" id="8_c8nfc"]
+[ext_resource type="Texture2D" uid="uid://bdur6ta4k2iju" path="res://assets/tiles/breakable.png" id="9_oxcik"]
+[ext_resource type="Texture2D" uid="uid://bq562cv0wn80n" path="res://assets/tiles/bouncy.png" id="10_obhq2"]
+[ext_resource type="Texture2D" uid="uid://c8jtcr87csejc" path="res://assets/tiles/moving.png" id="11_obhq2"]
+[ext_resource type="Texture2D" uid="uid://ctayfdfku0u2g" path="res://assets/tiles/spike.png" id="11_oxav3"]
+[ext_resource type="Texture2D" uid="uid://c0qagwukkdu2" path="res://assets/tiles/red.png" id="12_6lv7u"]
+[ext_resource type="Texture2D" uid="uid://bo7fbbewen8dd" path="res://assets/tiles/blue.png" id="13_8k4wh"]
+[ext_resource type="Texture2D" uid="uid://q6yfdqyhybb5" path="res://assets/tiles/random.png" id="14_mg4hm"]
+[ext_resource type="Texture2D" uid="uid://dwfj17m2b0mqo" path="res://assets/tiles/sticky.png" id="14_oxav3"]
+[ext_resource type="Texture2D" uid="uid://cabloihkxh6m0" path="res://assets/tiles/gold.png" id="15_4b4yl"]
+[ext_resource type="Texture2D" uid="uid://cueh56rj67sjw" path="res://assets/tiles/diamond.png" id="16_fyutr"]
+[ext_resource type="PackedScene" uid="uid://72hrbgja34hu" path="res://scenes/main/shockwave.tscn" id="20_6lv7u"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_6lv7u"]
+font = ExtResource("6_oxav3")
+font_size = 150
+outline_size = 20
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 20
+shadow_color = Color(0, 0, 0, 1)
+shadow_offset = Vector2(0, 10)
+
+[node name="Game" type="Node2D" unique_id=1364430288]
+
+[node name="Background" type="Parallax2D" parent="." unique_id=108548260]
+scroll_scale = Vector2(0, 0.8)
+repeat_size = Vector2(0, 810)
+repeat_times = 5
+
+[node name="Sprite" type="Sprite2D" parent="Background" unique_id=1177018716]
+texture = ExtResource("1_e64el")
+centered = false
+script = ExtResource("2_ma5rq")
+texture_array = Array[Texture2D]([ExtResource("1_e64el"), ExtResource("3_e3dby")])
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1975686721]
+
+[node name="Label" type="Label" parent="UI" unique_id=1014107896]
+offset_left = 33.0
+offset_top = 15.0
+offset_right = 1007.0
+offset_bottom = 271.0
+text = "0"
+label_settings = SubResource("LabelSettings_6lv7u")
+
+[node name="Player" parent="." unique_id=248425265 node_paths=PackedStringArray("base_tile", "spawner", "label", "shockwave_spawner") instance=ExtResource("5_gf1f2")]
+z_index = 5
+position = Vector2(535, 1310)
+scale = Vector2(1.1, 1.1)
+floor_max_angle = 0.0
+base_tile = NodePath("../BaseTile")
+spawner = NodePath("../Spawner")
+label = NodePath("../UI/Label")
+shockwave_spawner = NodePath("../Shockwave")
+shockwave_scene = ExtResource("20_6lv7u")
+
+[node name="Cam" type="Camera2D" parent="." unique_id=566507498 node_paths=PackedStringArray("player")]
+position = Vector2(540, 1160)
+offset = Vector2(0, -200)
+process_callback = 0
+position_smoothing_speed = 3.0
+script = ExtResource("5_obhq2")
+player = NodePath("../Player")
+
+[node name="Spawner" type="Node2D" parent="." unique_id=1034541477 node_paths=PackedStringArray("base_tile", "player")]
+script = ExtResource("6_0rn35")
+base_tile = NodePath("../BaseTile")
+player = NodePath("../Player")
+tile_scene = ExtResource("6_em1bs")
+tiles = Array[Texture2D]([ExtResource("8_c8nfc"), ExtResource("9_oxcik"), ExtResource("10_obhq2"), ExtResource("11_obhq2"), ExtResource("11_oxav3"), ExtResource("12_6lv7u"), ExtResource("14_oxav3"), ExtResource("13_8k4wh"), ExtResource("14_mg4hm"), ExtResource("15_4b4yl"), ExtResource("16_fyutr")])
+
+[node name="BaseTile" parent="." unique_id=140536108 instance=ExtResource("6_em1bs")]
+position = Vector2(540, 1460)
+
+[node name="Shockwave" type="CanvasLayer" parent="." unique_id=1307014140]

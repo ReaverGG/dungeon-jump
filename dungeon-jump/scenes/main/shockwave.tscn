@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://72hrbgja34hu"]
+
+[ext_resource type="Shader" uid="uid://m6fsw05ov6ll" path="res://code/shaders/shockwave.gdshader" id="1_6reiy"]
+[ext_resource type="Script" uid="uid://cymcabteq1cmr" path="res://code/shockwave.gd" id="2_txc66"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8k4wh"]
+shader = ExtResource("1_6reiy")
+shader_parameter/center = Vector2(0.5, 0.5)
+shader_parameter/force = 0.04
+shader_parameter/size = 0.0
+shader_parameter/thickness = 0.2
+shader_parameter/aberration = 0.5
+shader_parameter/brightness = 0.067
+
+[node name="Effect" type="ColorRect" unique_id=1678313174]
+material = SubResource("ShaderMaterial_8k4wh")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_txc66")
