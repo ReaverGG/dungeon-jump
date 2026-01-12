@@ -61,7 +61,7 @@ func _physics_process(delta: float) -> void:
 func handle_movement(delta: float) -> void:
 	var direction: float = Input.get_axis("left", "right")
 	
-	# Mobile
+	# Mobile Input
 	if Input.is_action_pressed("click"):
 		if get_global_mouse_position().x > get_viewport_rect().size.x / 2:
 			direction = 1.0
@@ -77,7 +77,6 @@ func handle_movement(delta: float) -> void:
 func handle_gravity(delta: float) -> void:
 	velocity.y += gravity * delta
 	if is_on_floor():
-		
 		jump()
 
 func handle_screen_wrap() -> void:
@@ -124,11 +123,16 @@ func check_platform_collisions() -> void:
 			handle_effects(collider.effect())
 			collider.boing()
 
-func handle_effects(tile: String):
-	if tile == "bouncy":
+func handle_effects(tile_type: String) -> void:
+	if tile_type == "bouncy":
 		velocity.y = -7000
-		var shockwave := shockwave_scene.instantiate()
-		get_parent().get_node("Shockwave").add_child(shockwave)
+		spawn_shockwave()
 		
-	elif tile == "spike":
+	elif tile_type == "spike":
 		velocity.y = -jump_force / 1.67
+
+func spawn_shockwave() -> void:
+	var shockwave := shockwave_scene.instantiate()
+	# Optimization: Pass self directly so Shockwave doesn't have to search for Player
+	shockwave.player = self 
+	get_parent().get_node("Shockwave").add_child(shockwave)
