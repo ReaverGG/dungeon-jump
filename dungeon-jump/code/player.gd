@@ -30,20 +30,25 @@ var record_y: float
 var is_locked: bool = true
 var squish_tween: Tween
 
+# Score Logic
 var score: int = 0:
 	set(value):
 		if score != value:
 			score = value
-			if spawner.speed_multiplier < 2:
-				spawner.speed_multiplier += 0.1
+			_on_score_increased()
 			label.text = str(score)
 
 func _ready() -> void:
+	add_to_group("player") # Optimization: Allows easy lookup without tree crawling
+	
 	base_scale = sprite.scale
 	score_origin_y = base_tile.global_position.y - base_offset
 	record_y = score_origin_y
 	
-	global_position = Vector2(get_viewport_rect().size.x / 2.0, score_origin_y + (base_offset * 10.0))
+	# Center player horizontally
+	var viewport_x = get_viewport_rect().size.x
+	global_position = Vector2(viewport_x / 2.0, score_origin_y + (base_offset * 10.0))
+	
 	animate_entry()
 
 func _physics_process(delta: float) -> void:
@@ -58,15 +63,15 @@ func _physics_process(delta: float) -> void:
 	check_platform_collisions()
 	move_and_slide()
 
+# --- Movement & Physics ---
+
 func handle_movement(delta: float) -> void:
 	var direction: float = Input.get_axis("left", "right")
 	
-	# Mobile Input
+	# Mobile Touch Input
 	if Input.is_action_pressed("click"):
-		if get_global_mouse_position().x > get_viewport_rect().size.x / 2:
-			direction = 1.0
-		else:
-			direction = -1.0
+		var viewport_center = get_viewport_rect().size.x / 2.0
+		direction = 1.0 if get_global_mouse_position().x > viewport_center else -1.0
 			
 	if direction:
 		sprite.flip_h = direction < 0
@@ -79,37 +84,24 @@ func handle_gravity(delta: float) -> void:
 	if is_on_floor():
 		jump()
 
+func jump() -> void:
+	velocity.y = -jump_force
+	animate_squish()
+
 func handle_screen_wrap() -> void:
-	global_position.x = wrapf(global_position.x, 0, get_viewport_rect().size.x)
+	var viewport_width = get_viewport_rect().size.x
+	global_position.x = wrapf(global_position.x, 0, viewport_width)
+
+# --- Gameplay Logic ---
 
 func update_score() -> void:
 	if global_position.y < record_y:
 		record_y = global_position.y
 		score = int((score_origin_y - record_y) / spawner.tile_distance)
 
-func jump() -> void:
-	velocity.y = -jump_force
-	animate_squish()
-
-func animate_squish() -> void:
-	if squish_tween:
-		squish_tween.kill()
-	
-	sprite.scale = Vector2(0.5, 1.5)
-	squish_tween = create_tween()
-	squish_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC)
-	squish_tween.tween_property(sprite, "scale", base_scale, 1.0)
-
-func animate_entry() -> void:
-	if randf() > 0.5: sprite.rotation_degrees = 360
-	else: sprite.rotation_degrees = -360
-	
-	var tween: Tween = create_tween()
-	tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
-	tween.tween_property(self, "global_position:y", score_origin_y, 1.0)
-	tween.tween_property(sprite, "rotation_degrees", 0.0, 1.0)
-	await tween.finished
-	is_locked = false
+func _on_score_increased() -> void:
+	if spawner.speed_multiplier < 2:
+		spawner.speed_multiplier += 0.1
 
 func check_platform_collisions() -> void:
 	var hit_this_frame: Array[Object] = []
@@ -118,21 +110,48 @@ func check_platform_collisions() -> void:
 		var collision := get_slide_collision(i)
 		var collider := collision.get_collider()
 		
+		# Ensure we only process each tile once per frame
 		if collider is Tile and not hit_this_frame.has(collider):
 			hit_this_frame.append(collider)
-			handle_effects(collider.effect())
+			apply_tile_effect(collider)
 			collider.boing()
 
-func handle_effects(tile_type: String) -> void:
-	if tile_type == "bouncy":
+func apply_tile_effect(tile: Tile) -> void:
+	var effect_name = tile.effect()
+	
+	if effect_name == "bouncy":
 		velocity.y = -7000
 		spawn_shockwave()
 		
-	elif tile_type == "spike":
+	elif effect_name == "spike":
 		velocity.y = -jump_force / 1.67
 
 func spawn_shockwave() -> void:
-	var shockwave := shockwave_scene.instantiate()
-	# Optimization: Pass self directly so Shockwave doesn't have to search for Player
-	shockwave.player = self 
+	if not shockwave_scene: return
+	
+	var shockwave = shockwave_scene.instantiate()
+	if shockwave is Shockwave:
+		shockwave.player = self
+		
 	get_parent().get_node("Shockwave").add_child(shockwave)
+
+# --- Animations ---
+
+func animate_squish() -> void:
+	if squish_tween: squish_tween.kill()
+	
+	sprite.scale = Vector2(0.5, 1.5)
+	squish_tween = create_tween()
+	squish_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC)
+	squish_tween.tween_property(sprite, "scale", base_scale, 1.0)
+
+func animate_entry() -> void:
+	sprite.rotation_degrees = 360 if randf() > 0.5 else -360
+	
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
+	tween.tween_property(self, "global_position:y", score_origin_y, 1.0)
+	tween.tween_property(sprite, "rotation_degrees", 0.0, 1.0)
+	
+	await tween.finished
+	is_locked = false

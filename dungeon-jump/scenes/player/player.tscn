@@ -6,7 +6,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dovo2"]
 size = Vector2(90, 103)
 
-[node name="Player" type="CharacterBody2D" unique_id=248425265 node_paths=PackedStringArray("sprite") groups=["Player"]]
+[node name="Player" type="CharacterBody2D" unique_id=248425265 node_paths=PackedStringArray("sprite")]
 platform_on_leave = 2
 script = ExtResource("1_dovo2")
 sprite = NodePath("Sprite")

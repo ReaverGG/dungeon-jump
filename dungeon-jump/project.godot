@@ -28,10 +28,6 @@ window/frame_pacing/android/swappy_mode=0
 window/stretch/mode="canvas_items"
 window/handheld/orientation=1
 
-[global_group]
-
-Player=""
-
 [input]
 
 right={
