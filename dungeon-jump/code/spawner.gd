@@ -7,8 +7,8 @@ extends Node2D
 @export var tiles: Array[Texture2D] 
 @export var max_dangerous_streak: int = 2
 
-# Speed increases by 0.05 for every 1 score. Maxes out at 2.0x speed.
-@export var difficulty_scale: float = 0.05 
+# Speed increases by 0.05 per 1 score, capped at 2.0
+@export var difficulty_scale: float = 0.05
 
 var speed_multiplier: float = 1.0
 var tile_distance: int = 300
@@ -16,6 +16,7 @@ var tiles_ahead: int = 5
 var _spawn_history: Array[bool] = []
 var _wall_distance: float = 20.0
 
+# Variant configuration
 var tile_variants: Array[Dictionary] = [
 	{ "weight": 35.0, "danger": false, "type": Tile.Type.NORMAL,    "tex": 0 },
 	{ "weight": 12.0, "danger": false, "type": Tile.Type.BREAKABLE, "tex": 1 },
@@ -27,7 +28,7 @@ var tile_variants: Array[Dictionary] = [
 	{ "weight": 5.0,  "danger": false, "type": Tile.Type.BLUE,      "tex": 7 },
 	{ "weight": 2.5,  "danger": false, "type": Tile.Type.MYSTERY,   "tex": 8 },
 	{ "weight": 0.9,  "danger": false, "type": Tile.Type.GOLDEN,    "tex": 9 },
-	{ "weight": 0.1,  "danger": false, "type": Tile.Type.DIAMOND,   "tex": 10 }
+	{ "weight": 0.05,  "danger": false, "type": Tile.Type.DIAMOND,   "tex": 10 }
 ]
 
 func _ready() -> void:
@@ -36,9 +37,8 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if player:
-		# Calculate speed based on score: 1.0 + (Score * Scale)
+		# Calculate speed based on score
 		var target_speed = 1.0 + (float(player.score) * difficulty_scale)
-		# Ensure it stays under 2.0
 		speed_multiplier = min(target_speed, 2.0)
 		
 		if _should_spawn_tile():
@@ -57,10 +57,11 @@ func _create_tile() -> void:
 
 	_update_history(data.danger)
 
-	# Safety Check: Use texture if available, otherwise default to 0
+	# Safety check for texture existence
 	if tiles.size() > data.tex:
 		tile.setup(tiles[data.tex], data.type)
 	else:
+		# Fallback to the first tile if texture is missing
 		if tiles.size() > 0:
 			tile.setup(tiles[0], data.type)
 	

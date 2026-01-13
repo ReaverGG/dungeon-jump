@@ -3,11 +3,10 @@ extends ColorRect
 var player: CharacterBody2D
 
 func _ready() -> void:
-	# Player is injected by player.gd before added to tree
+	# Player is injected by player.gd immediately after instantiation
 	if player:
 		_animate()
 	else:
-		# Fallback just in case
 		queue_free()
 
 func _process(_delta: float) -> void:
@@ -29,8 +28,8 @@ func _animate() -> void:
 	var tween = create_tween()
 	tween.tween_method(
 		func(val): material.set_shader_parameter("size", val), 
-		0.0, 3.5, 2.0
-	).set_trans(Tween.TRANS_LINEAR)
+		0.0, 1.5, 3.5
+	).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 	
 	await tween.finished
 	queue_free()

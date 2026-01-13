@@ -19,7 +19,6 @@ extends CharacterBody2D
 
 @export_group("Shockwave")
 @export var shockwave_scene: PackedScene
-# Finds the Shockwave node in the main scene safely
 @onready var shockwave_container: Node = get_tree().current_scene.get_node("Shockwave") 
 
 var _base_offset: float = 250.0
@@ -58,7 +57,6 @@ func _physics_process(delta: float) -> void:
 func _handle_movement(delta: float) -> void:
 	var direction: float = Input.get_axis("left", "right")
 	
-	# Mobile/Mouse Input
 	if Input.is_action_pressed("click"):
 		var center_x = get_viewport_rect().size.x / 2.0
 		direction = 1.0 if get_global_mouse_position().x > center_x else -1.0
@@ -83,11 +81,13 @@ func _check_platform_collisions() -> void:
 		var collision := get_slide_collision(i)
 		var collider := collision.get_collider() as Tile
 		
-		# Check if we hit a Tile
+		# Ensure we are hitting a valid Tile
 		if collider:
-			# Pass the collider instance so we can modify it (e.g., crack it)
 			_handle_tile_effect(collider.type, collider)
-			collider.boing()
+			
+			# Only play the boing animation if the tile didn't break
+			if collider.type != Tile.Type.BREAKABLE:
+				collider.boing()
 
 func _handle_tile_effect(type: Tile.Type, collider: Tile) -> void:
 	match type:
@@ -97,7 +97,9 @@ func _handle_tile_effect(type: Tile.Type, collider: Tile) -> void:
 		Tile.Type.SPIKE:
 			velocity.y = -jump_force / 1.67
 		Tile.Type.BREAKABLE:
-			collider.crack()
+			if collider.has_method("crack"):
+				velocity.y = -jump_force
+				collider.crack()
 
 func _spawn_shockwave() -> void:
 	if not shockwave_scene: return

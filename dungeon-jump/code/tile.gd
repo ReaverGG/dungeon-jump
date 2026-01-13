@@ -34,14 +34,17 @@ func setup(new_texture: Texture2D, new_type: Type) -> void:
 	sprite.texture = new_texture
 	type = new_type
 	
-	# Default behavior: 50% chance to move slow
+	# Default behavior: 50% chance to move slowly
 	should_move = randf() > 0.5
 	var target_speed: float = 100.0
 
 	match type:
 		Type.MOVING:
 			should_move = true   # ALWAYS moves
-			target_speed = 200.0 # Faster than others
+			target_speed = 200.0 # Fast speed
+		
+		Type.SPIKE:
+			should_move = false
 
 	if should_move:
 		move_speed = target_speed
@@ -49,9 +52,14 @@ func setup(new_texture: Texture2D, new_type: Type) -> void:
 	else:
 		move_speed = 0.0
 
-# Added this function so Player can call it
 func crack() -> void:
-	create_cracks()
+	collider.set_deferred("disabled", true)
+	should_move = false
+	var breakable: Node2D = breakable_scene.instantiate()
+	add_child(breakable)
+	breakable.global_position = global_position
+	sprite.visible = false
+	
 
 func boing() -> void:
 	if _squish_tween:
@@ -72,6 +80,8 @@ func _calculate_bounds() -> void:
 func _handle_movement(delta: float) -> void:
 	if should_move:
 		global_position.x += move_speed * direction * spawner.speed_multiplier * delta
+	else:
+		return
 	
 	if global_position.x < min_x:
 		global_position.x = min_x
@@ -82,12 +92,5 @@ func _handle_movement(delta: float) -> void:
 
 func _check_bounds() -> void:
 	var screen_bottom = get_viewport_transform().affine_inverse().origin.y + get_viewport_rect().size.y
-	if global_position.y > screen_bottom + 600.0:
+	if global_position.y > screen_bottom + 200.0:
 		queue_free()
-
-func create_cracks() -> void:
-	sprite.visible = false
-	collider.disabled = true
-	var breakable: Node2D = breakable_scene.instantiate()
-	breakable.global_position = global_position
-	add_child(breakable)
