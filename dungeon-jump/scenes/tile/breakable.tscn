@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bcgryijj08058"]
+
+[ext_resource type="Script" uid="uid://b0gonpsqfyx6b" path="res://code/breakable.gd" id="1_je1d0"]
+[ext_resource type="Texture2D" uid="uid://c4ps4q2rafahv" path="res://assets/tiles/breakableright.png" id="2_fubsx"]
+[ext_resource type="Texture2D" uid="uid://qrkufgsoke8n" path="res://assets/tiles/breakableleft.png" id="3_gx15p"]
+
+[node name="Breakable" type="Node2D" unique_id=199597779]
+script = ExtResource("1_je1d0")
+
+[node name="Right" type="Sprite2D" parent="." unique_id=245168539]
+position = Vector2(55.999996, 14.999999)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("2_fubsx")
+
+[node name="Left" type="Sprite2D" parent="." unique_id=1659130117]
+position = Vector2(-55.999996, 14.999999)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("3_gx15p")

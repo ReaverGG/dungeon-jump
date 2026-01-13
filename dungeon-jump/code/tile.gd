@@ -1,79 +1,77 @@
 class_name Tile
 extends AnimatableBody2D
 
+enum Type { NORMAL, BREAKABLE, BOUNCY, MOVING, SPIKE, RED, STICKY, BLUE, MYSTERY, GOLDEN, DIAMOND }
+
 @export var sprite: Sprite2D
 @export var wall_distance: float = 50.0
 
+@onready var collider: CollisionShape2D = $Collider
+@onready var spawner: Spawner = get_parent().get_node("Spawner")
+
+var type: Type = Type.NORMAL
+var breakable_scene: PackedScene = preload("res://scenes/tile/breakable.tscn")
+var should_move: bool
 var direction: float = 1.0
-var current_speed: float
+var move_speed: float = 0.0
 var min_x: float
 var max_x: float
-var spawner: Node2D
-var can_move: bool
-
-var squish_tween: Tween
 var base_scale: Vector2
-var screen_offset: float = 200.0
 
-# Optimization: Cache the tile type string
-var _tile_type: String
+var _squish_tween: Tween
 
 func _ready() -> void:
 	base_scale = sprite.scale
-	spawner = get_parent().get_node("Spawner")
-	
-	# Initial calculation
-	_refresh_tile_data()
-	
-	# Random movement logic (Keep this separate from forced movement)
-	can_move = randi() % 2 == 0 and name != "BaseTile"
-	
-	# Force movement if it is specifically a "moving" tile
-	if _tile_type.ends_with("moving"):
-		can_move = true
-	
-	if randf() > 0.5:
-		direction = 1.0
-	else:
-		direction = -1.0
-		
-	var collider_size = get_node("Collider").shape.size.x / 2
-	var viewport_width = get_viewport_rect().size.x
-	
-	min_x = wall_distance + collider_size
-	max_x = viewport_width - wall_distance - collider_size
-	
-	update_speed()
+	_calculate_bounds()
 
 func _physics_process(delta: float) -> void:
-	if can_move:
-		move_horizontal(delta)
+	if move_speed > 0:
+		_handle_movement(delta)
+	_check_bounds()
 
-	check_bounds()
-
-# --- NEW FUNCTION FOR RUNTIME CHANGES ---
-func change_type(new_texture: Texture2D) -> void:
+# Called by Spawner to initialize the tile
+func setup(new_texture: Texture2D, new_type: Type) -> void:
 	sprite.texture = new_texture
-	# We MUST refresh the cached data immediately, or the game will
-	# still think this is the old tile type.
-	_refresh_tile_data()
-	update_speed()
+	type = new_type
+	
+	# Default behavior: 50% chance to move slow
+	should_move = randf() > 0.5
+	var target_speed: float = 100.0
 
-func _refresh_tile_data() -> void:
-	# Parse the string again based on the NEW texture
-	_tile_type = sprite.texture.resource_path.get_file().get_basename()
+	match type:
+		Type.MOVING:
+			should_move = true   # ALWAYS moves
+			target_speed = 200.0 # Faster than others
 
-func update_speed() -> void:
-	if _tile_type.ends_with("moving"):
-		can_move = true
-		current_speed = 200.0
+	if should_move:
+		move_speed = target_speed
+		direction = 1.0 if randf() > 0.5 else -1.0
 	else:
-		# Reset speed if we changed AWAY from a moving tile
-		current_speed = 100.0
-# ----------------------------------------
+		move_speed = 0.0
 
-func move_horizontal(delta: float) -> void:
-	global_position.x += current_speed * direction * spawner.speed_multiplier * delta
+# Added this function so Player can call it
+func crack() -> void:
+	create_cracks()
+
+func boing() -> void:
+	if _squish_tween:
+		_squish_tween.kill()
+	
+	sprite.scale = Vector2(randf_range(0.9, 1.1), randf_range(0.9, 1.1))
+	
+	_squish_tween = create_tween()
+	_squish_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC)
+	_squish_tween.tween_property(sprite, "scale", base_scale, 1.5)
+
+func _calculate_bounds() -> void:
+	var collider_half_width = collider.shape.size.x / 2
+	var viewport_width = get_viewport_rect().size.x
+	min_x = wall_distance + collider_half_width
+	max_x = viewport_width - wall_distance - collider_half_width
+
+func _handle_movement(delta: float) -> void:
+	if should_move:
+		global_position.x += move_speed * direction * spawner.speed_multiplier * delta
 	
 	if global_position.x < min_x:
 		global_position.x = min_x
@@ -82,22 +80,14 @@ func move_horizontal(delta: float) -> void:
 		global_position.x = max_x
 		direction = -1.0
 
-func check_bounds() -> void:
+func _check_bounds() -> void:
 	var screen_bottom = get_viewport_transform().affine_inverse().origin.y + get_viewport_rect().size.y
-
-	if global_position.y > screen_bottom + screen_offset:
+	if global_position.y > screen_bottom + 600.0:
 		queue_free()
 
-func boing() -> void:
-	if squish_tween:
-		squish_tween.kill()
-	
-	sprite.scale = Vector2(randf_range(0.9, 1.1), randf_range(0.9, 1.1))
-	
-	squish_tween = create_tween()
-	squish_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC)
-	squish_tween.tween_property(sprite, "scale", base_scale, 1.5)
-
-# Returns the cached string instantly
-func effect() -> String:
-	return _tile_type
+func create_cracks() -> void:
+	sprite.visible = false
+	collider.disabled = true
+	var breakable: Node2D = breakable_scene.instantiate()
+	breakable.global_position = global_position
+	add_child(breakable)
