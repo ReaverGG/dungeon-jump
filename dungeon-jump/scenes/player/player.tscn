@@ -1,9 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://dvb7cmxi2ci7k"]
+[gd_scene load_steps=6 format=3 uid="uid://dvb7cmxi2ci7k"]
 
 [ext_resource type="Script" uid="uid://hv6kctmulsg1" path="res://code/player.gd" id="1_dovo2"]
 [ext_resource type="Texture2D" uid="uid://bp3m2l5ocdag7" path="res://assets/characters/default.png" id="2_dovo2"]
+[ext_resource type="Shader" uid="uid://bqqumy5o1axhe" path="res://code/shaders/outline.gdshader" id="2_gmlin"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_dovo2"]
+shader = ExtResource("2_gmlin")
+shader_parameter/line_color = Color(1, 1, 1, 1)
+shader_parameter/line_thickness = 5.6170002668075
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dovo2"]
 size = Vector2(90, 103)

@@ -19,7 +19,10 @@ extends CharacterBody2D
 
 @export_group("Shockwave")
 @export var shockwave_scene: PackedScene
-@onready var shockwave_container: Node = get_tree().current_scene.get_node("Shockwave") 
+@onready var shockwave_container: Node = get_tree().current_scene.get_node("Shockwave")
+
+
+var death_offset: float = Tile.new().screen_deletion_offset
 
 var _base_offset: float = 250.0
 var _base_scale: Vector2
@@ -27,6 +30,7 @@ var _score_origin_y: float
 var _record_y: float
 var _is_locked: bool = true
 var _squish_tween: Tween
+var _processed_colliders: Array[Object] = []
 
 var score: int = 0:
 	set(value):
@@ -45,6 +49,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_handle_screen_wrap()
 	_update_score()
+	if _is_locked == false:
+		_handle_death()
 
 	if not _is_locked:
 		_handle_movement(delta)
@@ -77,15 +83,16 @@ func _jump() -> void:
 	_animate_squish()
 
 func _check_platform_collisions() -> void:
-	var processed_colliders = [] # 1. Create a list to track processed objects
+	# Clear the array to reuse it instead of creating a new one
+	_processed_colliders.clear()
 	
 	for i in get_slide_collision_count():
 		var collision := get_slide_collision(i)
 		var collider := collision.get_collider() as Tile
 		
-		# 2. Check if valid AND if we haven't processed it yet
-		if collider and not collider in processed_colliders:
-			processed_colliders.append(collider) # 3. Mark as processed
+		# Check if valid and not processed
+		if collider and not collider in _processed_colliders:
+			_processed_colliders.append(collider)
 			
 			_handle_tile_effect(collider.type, collider)
 			
@@ -103,6 +110,7 @@ func _handle_tile_effect(type: Tile.Type, collider: Tile) -> void:
 			_spawn_shockwave()
 		Tile.Type.SPIKE:
 			velocity.y = -jump_force / 1.67
+			collider.change_tile("normal")
 		Tile.Type.BREAKABLE:
 			if collider.has_method("crack"):
 				velocity.y = -jump_force
@@ -125,7 +133,13 @@ func _on_score_changed() -> void:
 	label.animate()
 
 func _handle_screen_wrap() -> void:
-	global_position.x = wrapf(global_position.x, 0, get_viewport_rect().size.x)
+	var viewport_width = get_viewport_rect().size.x
+	
+	var new_x = wrapf(global_position.x, 0, viewport_width)
+	
+	if new_x != global_position.x:
+		global_position.x = new_x
+		reset_physics_interpolation()
 
 func _animate_squish() -> void:
 	if _squish_tween: _squish_tween.kill()
@@ -144,3 +158,8 @@ func _animate_entry() -> void:
 	tween.tween_property(sprite, "rotation_degrees", 0.0, 1.0)
 	await tween.finished
 	_is_locked = false
+
+func _handle_death() -> void:
+	var death_line = _record_y + get_viewport_rect().size.y / 2
+	if global_position.y > death_line:
+		queue_free()

@@ -1,14 +1,15 @@
-[gd_scene format=3 uid="uid://cjwmmfqh4vdux"]
+[gd_scene load_steps=24 format=3 uid="uid://cjwmmfqh4vdux"]
 
 [ext_resource type="Texture2D" uid="uid://4jjjae46fyqc" path="res://assets/bg/bricks.png" id="1_e64el"]
 [ext_resource type="Script" uid="uid://dbdib3ympo6ej" path="res://code/background.gd" id="2_ma5rq"]
 [ext_resource type="Texture2D" uid="uid://cj0bncwuxn1jm" path="res://assets/bg/sand.png" id="3_e3dby"]
+[ext_resource type="FontFile" uid="uid://bf0af0w2ei21n" path="res://assets/font/Robot Crush.ttf" id="4_8k4wh"]
 [ext_resource type="Script" uid="uid://88evqf0nrsya" path="res://code/label.gd" id="5_8k4wh"]
 [ext_resource type="PackedScene" uid="uid://dvb7cmxi2ci7k" path="res://scenes/player/player.tscn" id="5_gf1f2"]
+[ext_resource type="FontFile" uid="uid://2nh5rpwxsqtn" path="res://assets/font/Robot Crush Italic.ttf" id="5_mg4hm"]
 [ext_resource type="Script" uid="uid://gf86tvcyvy30" path="res://code/camera.gd" id="5_obhq2"]
 [ext_resource type="Script" uid="uid://dv2kap2ufe0tk" path="res://code/spawner.gd" id="6_0rn35"]
 [ext_resource type="PackedScene" uid="uid://c27x6bnodca5r" path="res://scenes/tile/tile.tscn" id="6_em1bs"]
-[ext_resource type="FontFile" uid="uid://cveiw0xq6nwlq" path="res://assets/font/archivo_black.ttf" id="6_oxav3"]
 [ext_resource type="Texture2D" uid="uid://bwxw3j1rl85dp" path="res://assets/tiles/normal.png" id="8_c8nfc"]
 [ext_resource type="Texture2D" uid="uid://bdur6ta4k2iju" path="res://assets/tiles/breakable.png" id="9_oxcik"]
 [ext_resource type="Texture2D" uid="uid://bq562cv0wn80n" path="res://assets/tiles/bouncy.png" id="10_obhq2"]
@@ -23,7 +24,7 @@
 [ext_resource type="PackedScene" uid="uid://72hrbgja34hu" path="res://scenes/main/shockwave.tscn" id="20_6lv7u"]
 
 [sub_resource type="Theme" id="Theme_8k4wh"]
-default_font = ExtResource("6_oxav3")
+default_font = ExtResource("4_8k4wh")
 default_font_size = 16
 
 [node name="Game" type="Node2D" unique_id=1364430288]
@@ -41,20 +42,38 @@ texture_array = Array[Texture2D]([ExtResource("1_e64el"), ExtResource("3_e3dby")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1975686721]
 
-[node name="Label" type="RichTextLabel" parent="UI" unique_id=931548620]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI" unique_id=1651949594]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 37.0
+offset_right = -47.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+
+[node name="Label" type="RichTextLabel" parent="UI/VBoxContainer" unique_id=931548620]
 clip_contents = false
-offset_left = 49.0
-offset_top = 37.0
-offset_right = 1023.0
-offset_bottom = 293.0
+layout_mode = 2
 theme = SubResource("Theme_8k4wh")
-theme_override_font_sizes/normal_font_size = 150
-theme_override_font_sizes/bold_font_size = 150
-theme_override_font_sizes/bold_italics_font_size = 150
-theme_override_font_sizes/italics_font_size = 150
-theme_override_font_sizes/mono_font_size = 150
+theme_override_colors/selection_color = Color(0.67280036, 0, 0.055856854, 0.8)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/line_separation = -40
+theme_override_constants/shadow_outline_size = 30
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 10
+theme_override_constants/outline_size = 30
+theme_override_fonts/normal_font = ExtResource("4_8k4wh")
+theme_override_fonts/italics_font = ExtResource("5_mg4hm")
+theme_override_font_sizes/normal_font_size = 180
+theme_override_font_sizes/bold_font_size = 180
+theme_override_font_sizes/bold_italics_font_size = 180
+theme_override_font_sizes/italics_font_size = 180
+theme_override_font_sizes/mono_font_size = 180
 bbcode_enabled = true
 text = "0"
+fit_content = true
 script = ExtResource("5_8k4wh")
 
 [node name="Player" parent="." unique_id=248425265 node_paths=PackedStringArray("base_tile", "spawner", "label") instance=ExtResource("5_gf1f2")]
@@ -64,7 +83,7 @@ scale = Vector2(1.1, 1.1)
 floor_max_angle = 0.0
 base_tile = NodePath("../BaseTile")
 spawner = NodePath("../Spawner")
-label = NodePath("../UI/Label")
+label = NodePath("../UI/VBoxContainer/Label")
 shockwave_scene = ExtResource("20_6lv7u")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=566507498 node_paths=PackedStringArray("player")]

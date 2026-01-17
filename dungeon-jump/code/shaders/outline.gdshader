@@ -1,21 +1,33 @@
-shader_type spatial;
-render_mode blend_mix;
+shader_type canvas_item;
 
-uniform float fresnel_power : hint_range(0.1, 10.0) = 3.0;
-uniform float emission_power : hint_range(0.1, 10.0) = 3.0;
-uniform float white_lerp : hint_range(0.0, 0.5) = 0.2;
-uniform float scroll_speed = 0.2;
-uniform sampler2D colors_texture:filter_nearest;
+uniform vec4 line_color : source_color = vec4(1.0, 1.0, 1.0, 1.0);
+uniform float line_thickness : hint_range(0.0, 10.0) = 1.0;
 
+// precision: Higher = smoother corners, but more GPU usage. 
+// 16 is usually enough for characters.
+const int PRECISION = 64; 
 
 void fragment() {
-	float f = clamp(pow(1.0 - dot(NORMAL, VIEW), fresnel_power), 0.0, 1.0);
-	ALPHA = f;
-	float t = clamp(f * white_lerp, 0.0, 1.0);
-	float angle = atan(NORMAL.y, NORMAL.x);
-	float u = (angle / (2.0 * 3.14159)) + 0.5;
-	vec2 new_uv = vec2(mod(u + TIME * scroll_speed,1.0), 0.0);
-	vec3 color = texture(colors_texture,new_uv).rgb;
-	ALBEDO = mix(vec3(0.0),color , f);
-	EMISSION = mix(color * f, vec3(1.0), t) * emission_power;
+	vec2 size = TEXTURE_PIXEL_SIZE * line_thickness;
+	float outline = 0.0;
+	
+	// Iterate in a circle around the pixel
+	for (int i = 0; i < PRECISION; i++) {
+		// Calculate the angle for this sample
+		float angle = (float(i) * 6.28318) / float(PRECISION);
+		
+		// Create an offset vector based on that angle
+		vec2 offset = vec2(sin(angle), cos(angle)) * size;
+		
+		// Check the pixel at that offset
+		outline += texture(TEXTURE, UV + offset).a;
+	}
+	
+	// Clamp to 0-1 range
+	outline = min(outline, 1.0);
+	
+	vec4 color = texture(TEXTURE, UV);
+	
+	// If the original pixel is transparent, but we found neighbors, draw the outline
+	COLOR = mix(color, line_color, outline - color.a);
 }
