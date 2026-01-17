@@ -7,7 +7,7 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_dovo2"]
 shader = ExtResource("2_gmlin")
 shader_parameter/line_color = Color(1, 1, 1, 1)
-shader_parameter/line_thickness = 5.6170002668075
+shader_parameter/line_thickness = 5.50000026125
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dovo2"]
 size = Vector2(90, 103)

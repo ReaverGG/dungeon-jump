@@ -6,6 +6,6 @@ extends Camera2D
 var last_y_pos: float
 
 func _physics_process(delta: float) -> void:
-	if player:
+	if player and player.dead == false:
 		last_y_pos = player.global_position.y
 	global_position.y = lerp(global_position.y, last_y_pos, speed * delta)

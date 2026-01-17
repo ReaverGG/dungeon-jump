@@ -23,6 +23,7 @@ extends CharacterBody2D
 
 
 var death_offset: float = Tile.new().screen_deletion_offset
+var dead: bool = false
 
 var _base_offset: float = 250.0
 var _base_scale: Vector2
@@ -49,7 +50,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_handle_screen_wrap()
 	_update_score()
-	if _is_locked == false:
+	if _is_locked == false and !dead:
 		_handle_death()
 
 	if not _is_locked:
@@ -98,7 +99,8 @@ func _check_platform_collisions() -> void:
 			
 			# Only play the boing animation if the tile didn't break
 			if collider.type != Tile.Type.BREAKABLE:
-				collider.boing()
+				if _is_locked == false:
+					collider.boing()
 
 func _handle_tile_effect(type: Tile.Type, collider: Tile) -> void:
 	if type != Tile.Type.BOUNCY:
@@ -107,6 +109,7 @@ func _handle_tile_effect(type: Tile.Type, collider: Tile) -> void:
 		Tile.Type.BOUNCY:
 			gravity = 5000.0
 			velocity.y = -7000.0
+			_add_juice()
 			_spawn_shockwave()
 		Tile.Type.SPIKE:
 			velocity.y = -jump_force / 1.67
@@ -162,4 +165,9 @@ func _animate_entry() -> void:
 func _handle_death() -> void:
 	var death_line = _record_y + get_viewport_rect().size.y / 2
 	if global_position.y > death_line:
-		queue_free()
+		dead = true
+
+func _add_juice() -> void:
+	self_modulate = Color.BLACK
+	var modulate_tween: Tween = create_tween()
+	modulate_tween.tween_property(self, "self_modulate", Color.WHITE, 1.0)
