@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://4jjjae46fyqc" path="res://assets/bg/bricks.png" id="1_e64el"]
 [ext_resource type="Script" uid="uid://dbdib3ympo6ej" path="res://code/background.gd" id="2_ma5rq"]
 [ext_resource type="Texture2D" uid="uid://cj0bncwuxn1jm" path="res://assets/bg/sand.png" id="3_e3dby"]
+[ext_resource type="Script" uid="uid://88evqf0nrsya" path="res://code/label.gd" id="5_8k4wh"]
 [ext_resource type="PackedScene" uid="uid://dvb7cmxi2ci7k" path="res://scenes/player/player.tscn" id="5_gf1f2"]
 [ext_resource type="Script" uid="uid://gf86tvcyvy30" path="res://code/camera.gd" id="5_obhq2"]
 [ext_resource type="Script" uid="uid://dv2kap2ufe0tk" path="res://code/spawner.gd" id="6_0rn35"]
@@ -21,14 +22,9 @@
 [ext_resource type="Texture2D" uid="uid://cueh56rj67sjw" path="res://assets/tiles/diamond.png" id="16_fyutr"]
 [ext_resource type="PackedScene" uid="uid://72hrbgja34hu" path="res://scenes/main/shockwave.tscn" id="20_6lv7u"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_6lv7u"]
-font = ExtResource("6_oxav3")
-font_size = 150
-outline_size = 20
-outline_color = Color(0, 0, 0, 1)
-shadow_size = 20
-shadow_color = Color(0, 0, 0, 1)
-shadow_offset = Vector2(0, 10)
+[sub_resource type="Theme" id="Theme_8k4wh"]
+default_font = ExtResource("6_oxav3")
+default_font_size = 16
 
 [node name="Game" type="Node2D" unique_id=1364430288]
 
@@ -45,32 +41,33 @@ texture_array = Array[Texture2D]([ExtResource("1_e64el"), ExtResource("3_e3dby")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1975686721]
 
-[node name="Label" type="Label" parent="UI" unique_id=1014107896]
-offset_left = 33.0
-offset_top = 15.0
-offset_right = 1007.0
-offset_bottom = 271.0
+[node name="Label" type="RichTextLabel" parent="UI" unique_id=931548620]
+clip_contents = false
+offset_left = 49.0
+offset_top = 37.0
+offset_right = 1023.0
+offset_bottom = 293.0
+theme = SubResource("Theme_8k4wh")
+theme_override_font_sizes/normal_font_size = 150
+theme_override_font_sizes/bold_font_size = 150
+theme_override_font_sizes/bold_italics_font_size = 150
+theme_override_font_sizes/italics_font_size = 150
+theme_override_font_sizes/mono_font_size = 150
+bbcode_enabled = true
 text = "0"
-label_settings = SubResource("LabelSettings_6lv7u")
+script = ExtResource("5_8k4wh")
 
-[node name="Player" parent="." unique_id=248425265 node_paths=PackedStringArray("base_tile", "spawner", "label", "shockwave_spawner") instance=ExtResource("5_gf1f2")]
+[node name="Player" parent="." unique_id=248425265 node_paths=PackedStringArray("base_tile", "spawner", "label") instance=ExtResource("5_gf1f2")]
 z_index = 5
 position = Vector2(535, 1310)
 scale = Vector2(1.1, 1.1)
 floor_max_angle = 0.0
 base_tile = NodePath("../BaseTile")
 spawner = NodePath("../Spawner")
-move_speed = null
-acceleration = null
-deceleration = null
-jump_force = null
-gravity = null
-rotation_divider = null
 label = NodePath("../UI/Label")
-shockwave_spawner = NodePath("../Shockwave")
 shockwave_scene = ExtResource("20_6lv7u")
 
-[node name="Cam" type="Camera2D" parent="." unique_id=566507498 node_paths=PackedStringArray("player")]
+[node name="Camera" type="Camera2D" parent="." unique_id=566507498 node_paths=PackedStringArray("player")]
 position = Vector2(540, 1160)
 offset = Vector2(0, -200)
 process_callback = 0

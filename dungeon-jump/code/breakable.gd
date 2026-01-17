@@ -4,6 +4,7 @@ extends Node2D
 @onready var left: Sprite2D = $Left
 
 var breakable_rotation: float = 55.5
+
 func _ready() -> void:
 	var tween: Tween = create_tween()
 	var tween_time: float = 1.0

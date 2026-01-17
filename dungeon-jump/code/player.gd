@@ -5,7 +5,7 @@ extends CharacterBody2D
 @export var sprite: Sprite2D
 @export var base_tile: Node2D
 @export var spawner: Spawner
-@export var label: Label
+@export var label: RichTextLabel
 
 @export_group("Movement")
 @export var move_speed: float = 1670.0
@@ -77,12 +77,16 @@ func _jump() -> void:
 	_animate_squish()
 
 func _check_platform_collisions() -> void:
+	var processed_colliders = [] # 1. Create a list to track processed objects
+	
 	for i in get_slide_collision_count():
 		var collision := get_slide_collision(i)
 		var collider := collision.get_collider() as Tile
 		
-		# Ensure we are hitting a valid Tile
-		if collider:
+		# 2. Check if valid AND if we haven't processed it yet
+		if collider and not collider in processed_colliders:
+			processed_colliders.append(collider) # 3. Mark as processed
+			
 			_handle_tile_effect(collider.type, collider)
 			
 			# Only play the boing animation if the tile didn't break
@@ -90,9 +94,12 @@ func _check_platform_collisions() -> void:
 				collider.boing()
 
 func _handle_tile_effect(type: Tile.Type, collider: Tile) -> void:
+	if type != Tile.Type.BOUNCY:
+		gravity = 5867.0
 	match type:
 		Tile.Type.BOUNCY:
-			velocity.y = -7000
+			gravity = 5000.0
+			velocity.y = -7000.0
 			_spawn_shockwave()
 		Tile.Type.SPIKE:
 			velocity.y = -jump_force / 1.67
@@ -115,6 +122,7 @@ func _update_score() -> void:
 
 func _on_score_changed() -> void:
 	label.text = str(score)
+	label.animate()
 
 func _handle_screen_wrap() -> void:
 	global_position.x = wrapf(global_position.x, 0, get_viewport_rect().size.x)

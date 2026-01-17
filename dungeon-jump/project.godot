@@ -28,6 +28,10 @@ window/frame_pacing/android/swappy_mode=0
 window/stretch/mode="canvas_items"
 window/handheld/orientation=1
 
+[dotnet]
+
+project/assembly_name="Dungeon Jump"
+
 [input]
 
 right={

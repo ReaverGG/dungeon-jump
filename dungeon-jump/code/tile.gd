@@ -59,6 +59,8 @@ func crack() -> void:
 	add_child(breakable)
 	breakable.global_position = global_position
 	sprite.visible = false
+	await breakable.ready
+	queue_free()
 	
 
 func boing() -> void:
