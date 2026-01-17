@@ -168,6 +168,6 @@ func _handle_death() -> void:
 		dead = true
 
 func _add_juice() -> void:
-	self_modulate = Color.BLACK
+	modulate = Color.BLACK
 	var modulate_tween: Tween = create_tween()
-	modulate_tween.tween_property(self, "self_modulate", Color.WHITE, 1.0)
+	modulate_tween.tween_property(self, "modulate", Color.WHITE, 1.0)
