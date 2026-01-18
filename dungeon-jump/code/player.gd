@@ -210,8 +210,5 @@ func take_damage(amount: int) -> void:
 		
 func _update_heart_display() -> void:
 	for i in range(hearts_list.size()):
-		var should_show: bool = i < health
-		if should_show == false:
-			hearts_list[i].animator.play("die")
-		else:
-			hearts_list[i].animator.play("spawn")
+		hearts_list[i].should_show = i < health
+		print(hearts_list[i].should_show)
