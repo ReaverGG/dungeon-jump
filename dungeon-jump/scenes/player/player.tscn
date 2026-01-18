@@ -1,23 +1,76 @@
-[gd_scene load_steps=5 format=3 uid="uid://dvb7cmxi2ci7k"]
+[gd_scene load_steps=9 format=3 uid="uid://dvb7cmxi2ci7k"]
 
 [ext_resource type="Script" uid="uid://hv6kctmulsg1" path="res://code/player.gd" id="1_dovo2"]
 [ext_resource type="Texture2D" uid="uid://bp3m2l5ocdag7" path="res://assets/characters/default.png" id="2_dovo2"]
-[ext_resource type="PackedScene" uid="uid://de72cram0fl61" path="res://scenes/player/bounce_particles.tscn" id="2_gmlin"]
+[ext_resource type="Shader" uid="uid://cuqg442fw5h44" path="res://code/shaders/tint_and_glow.gdshader" id="2_gmlin"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dovo2"]
 size = Vector2(90, 103)
 
-[node name="Player" type="CharacterBody2D" unique_id=248425265 node_paths=PackedStringArray("sprite")]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lvxji"]
+shader = ExtResource("2_gmlin")
+shader_parameter/tint_color = Color(1, 1, 1, 1)
+shader_parameter/tint_amount = 0.0
+shader_parameter/glow_color = Color(1, 0, 0, 1)
+shader_parameter/glow_intensity = 0.0
+shader_parameter/pulse_speed = 0.0
+
+[sub_resource type="Animation" id="Animation_p47bc"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:material:shader_parameter/tint_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_75vfm"]
+resource_name = "hit"
+length = 0.7
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:material:shader_parameter/tint_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.10000001, 0.20000002, 0.3, 0.4, 0.5, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0owmy"]
+_data = {
+&"RESET": SubResource("Animation_p47bc"),
+&"hit": SubResource("Animation_75vfm")
+}
+
+[node name="Player" type="CharacterBody2D" unique_id=248425265 node_paths=PackedStringArray("sprite", "animator")]
 platform_on_leave = 2
 script = ExtResource("1_dovo2")
 sprite = NodePath("Sprite")
+animator = NodePath("Animator")
 
 [node name="Collider" type="CollisionShape2D" parent="." unique_id=495147889]
 position = Vector2(0, 13.5)
 shape = SubResource("RectangleShape2D_dovo2")
 
-[node name="BounceParticles" parent="." unique_id=1069123014 instance=ExtResource("2_gmlin")]
-position = Vector2(0, 66)
-
 [node name="Sprite" type="Sprite2D" parent="." unique_id=896487993]
+material = SubResource("ShaderMaterial_lvxji")
 texture = ExtResource("2_dovo2")
+
+[node name="JumpParticles" type="Marker2D" parent="." unique_id=1026394144]
+position = Vector2(0, 65)
+
+[node name="Animator" type="AnimationPlayer" parent="." unique_id=1781039345]
+libraries = {
+&"": SubResource("AnimationLibrary_0owmy")
+}

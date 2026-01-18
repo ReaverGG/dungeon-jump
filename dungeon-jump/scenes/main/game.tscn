@@ -1,8 +1,9 @@
-[gd_scene load_steps=24 format=3 uid="uid://cjwmmfqh4vdux"]
+[gd_scene load_steps=26 format=3 uid="uid://cjwmmfqh4vdux"]
 
 [ext_resource type="Texture2D" uid="uid://4jjjae46fyqc" path="res://assets/bg/bricks.png" id="1_e64el"]
 [ext_resource type="Script" uid="uid://dbdib3ympo6ej" path="res://code/background.gd" id="2_ma5rq"]
 [ext_resource type="Texture2D" uid="uid://cj0bncwuxn1jm" path="res://assets/bg/sand.png" id="3_e3dby"]
+[ext_resource type="PackedScene" uid="uid://di8ebwei1cio4" path="res://scenes/ui/heart_scene.tscn" id="4_0u50o"]
 [ext_resource type="FontFile" uid="uid://bf0af0w2ei21n" path="res://assets/font/Robot Crush.ttf" id="4_8k4wh"]
 [ext_resource type="Script" uid="uid://88evqf0nrsya" path="res://code/label.gd" id="5_8k4wh"]
 [ext_resource type="PackedScene" uid="uid://dvb7cmxi2ci7k" path="res://scenes/player/player.tscn" id="5_gf1f2"]
@@ -10,6 +11,7 @@
 [ext_resource type="Script" uid="uid://gf86tvcyvy30" path="res://code/camera.gd" id="5_obhq2"]
 [ext_resource type="Script" uid="uid://dv2kap2ufe0tk" path="res://code/spawner.gd" id="6_0rn35"]
 [ext_resource type="PackedScene" uid="uid://c27x6bnodca5r" path="res://scenes/tile/tile.tscn" id="6_em1bs"]
+[ext_resource type="Script" uid="uid://bthuv7mxovqru" path="res://code/black_overlay.gd" id="7_4b4yl"]
 [ext_resource type="Texture2D" uid="uid://bwxw3j1rl85dp" path="res://assets/tiles/normal.png" id="8_c8nfc"]
 [ext_resource type="Texture2D" uid="uid://bdur6ta4k2iju" path="res://assets/tiles/breakable.png" id="9_oxcik"]
 [ext_resource type="Texture2D" uid="uid://bq562cv0wn80n" path="res://assets/tiles/bouncy.png" id="10_obhq2"]
@@ -42,17 +44,54 @@ texture_array = Array[Texture2D]([ExtResource("1_e64el"), ExtResource("3_e3dby")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1975686721]
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI" unique_id=1651949594]
+[node name="HeartContainer" type="HBoxContainer" parent="UI" unique_id=452793299]
+offset_left = 30.0
+offset_top = 45.0
+offset_right = 580.0
+offset_bottom = 45.0
+size_flags_horizontal = 8
+theme_override_constants/separation = 12
+
+[node name="Heart1" parent="UI/HeartContainer" unique_id=394170850 instance=ExtResource("4_0u50o")]
+layout_mode = 2
+
+[node name="Heart2" parent="UI/HeartContainer" unique_id=1529990857 instance=ExtResource("4_0u50o")]
+layout_mode = 2
+
+[node name="Heart3" parent="UI/HeartContainer" unique_id=1623015608 instance=ExtResource("4_0u50o")]
+layout_mode = 2
+
+[node name="Heart4" parent="UI/HeartContainer" unique_id=35652943 instance=ExtResource("4_0u50o")]
+layout_mode = 2
+
+[node name="Heart5" parent="UI/HeartContainer" unique_id=53757539 instance=ExtResource("4_0u50o")]
+layout_mode = 2
+
+[node name="Heart6" parent="UI/HeartContainer" unique_id=1227728111 instance=ExtResource("4_0u50o")]
+layout_mode = 2
+
+[node name="Heart7" parent="UI/HeartContainer" unique_id=1683017424 instance=ExtResource("4_0u50o")]
+layout_mode = 2
+
+[node name="Heart8" parent="UI/HeartContainer" unique_id=1522593469 instance=ExtResource("4_0u50o")]
+layout_mode = 2
+
+[node name="Heart9" parent="UI/HeartContainer" unique_id=2052121853 instance=ExtResource("4_0u50o")]
+layout_mode = 2
+
+[node name="UIContainer" type="VBoxContainer" parent="UI" unique_id=1651949594]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 37.0
+offset_top = 118.0
 offset_right = -47.0
+offset_bottom = 118.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 30
 
-[node name="Label" type="RichTextLabel" parent="UI/VBoxContainer" unique_id=931548620]
+[node name="Label" type="RichTextLabel" parent="UI/UIContainer" unique_id=931548620]
 clip_contents = false
 layout_mode = 2
 theme = SubResource("Theme_8k4wh")
@@ -76,6 +115,17 @@ text = "0"
 fit_content = true
 script = ExtResource("5_8k4wh")
 
+[node name="BlackOverlay" type="ColorRect" parent="UI" unique_id=428033872]
+visible = false
+custom_minimum_size = Vector2(0, 10.4)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+script = ExtResource("7_4b4yl")
+
 [node name="Player" parent="." unique_id=248425265 node_paths=PackedStringArray("base_tile", "spawner", "label") instance=ExtResource("5_gf1f2")]
 z_index = 5
 position = Vector2(535, 1310)
@@ -83,7 +133,13 @@ scale = Vector2(1.1, 1.1)
 floor_max_angle = 0.0
 base_tile = NodePath("../BaseTile")
 spawner = NodePath("../Spawner")
-label = NodePath("../UI/VBoxContainer/Label")
+label = NodePath("../UI/UIContainer/Label")
+move_speed = null
+acceleration = null
+deceleration = null
+jump_force = null
+gravity = null
+rotation_divider = null
 shockwave_scene = ExtResource("20_6lv7u")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=566507498 node_paths=PackedStringArray("player")]

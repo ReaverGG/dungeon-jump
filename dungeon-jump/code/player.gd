@@ -6,6 +6,7 @@ extends CharacterBody2D
 @export var base_tile: Node2D
 @export var spawner: Spawner
 @export var label: RichTextLabel
+@export var animator: AnimationPlayer
 
 @export_group("Movement")
 @export var move_speed: float = 1670.0
@@ -32,6 +33,18 @@ var _record_y: float
 var _is_locked: bool = true
 var _squish_tween: Tween
 var _processed_colliders: Array[Object] = []
+var particle_scene: PackedScene = preload("res://scenes/player/jump_particles.tscn")
+
+var max_health: int = 10
+var health: int = 3:
+	set(value):
+		if value > max_health:
+			value = max_health
+		elif value < 0:
+			value = 0
+		health = value
+		print(health)
+var hearts_list: Array[Control]
 
 var score: int = 0:
 	set(value):
@@ -40,6 +53,10 @@ var score: int = 0:
 			_on_score_changed()
 
 func _ready() -> void:
+	var hearts_container = $"../UI/HeartContainer"
+	for i in hearts_container.get_children():
+		hearts_list.append(i)
+	_update_heart_display()
 	_base_scale = sprite.scale
 	_score_origin_y = base_tile.global_position.y - _base_offset
 	_record_y = _score_origin_y
@@ -76,12 +93,9 @@ func _handle_movement(delta: float) -> void:
 
 func _handle_gravity(delta: float) -> void:
 	velocity.y += gravity * delta
-	if is_on_floor():
-		_jump()
 
 func _jump() -> void:
 	velocity.y = -jump_force
-	_animate_squish()
 
 func _check_platform_collisions() -> void:
 	# Clear the array to reuse it instead of creating a new one
@@ -103,21 +117,33 @@ func _check_platform_collisions() -> void:
 					collider.boing()
 
 func _handle_tile_effect(type: Tile.Type, collider: Tile) -> void:
+	var particles := particle_scene.instantiate()
+	particles.global_position = get_node("Collider").global_position + Vector2(0, get_node("Collider").shape.size.y)
+	get_parent().add_child(particles)
+	
+	_jump()
 	if type != Tile.Type.BOUNCY:
 		gravity = 5867.0
+	if type != Tile.Type.SPIKE and type != Tile.Type.RED:
+		_animate_squish()
 	match type:
 		Tile.Type.BOUNCY:
-			gravity = 5000.0
+			gravity = 4000.0
 			velocity.y = -7000.0
 			_add_juice()
 			_spawn_shockwave()
 		Tile.Type.SPIKE:
-			velocity.y = -jump_force / 1.67
-			collider.change_tile("normal")
+			take_damage(1)
+			velocity.y = -jump_force / 1.2
+			GameManager._hit_stop()
 		Tile.Type.BREAKABLE:
 			if collider.has_method("crack"):
 				velocity.y = -jump_force
 				collider.crack()
+		Tile.Type.RED:
+			take_damage(2)
+			velocity.y = -jump_force / 1.2
+			GameManager._hit_stop()
 
 func _spawn_shockwave() -> void:
 	if not shockwave_scene: return
@@ -166,8 +192,26 @@ func _handle_death() -> void:
 	var death_line = _record_y + get_viewport_rect().size.y / 2
 	if global_position.y > death_line:
 		dead = true
+		take_damage(max_health)
+		GameManager._hit_stop()
 
 func _add_juice() -> void:
-	modulate = Color.BLACK
-	var modulate_tween: Tween = create_tween()
-	modulate_tween.tween_property(self, "modulate", Color.WHITE, 1.0)
+	pass
+	#modulate = Color.BLACK
+	#var modulate_tween: Tween = create_tween()
+	#modulate_tween.tween_property(self, "modulate", Color.WHITE, 1.0)
+
+func take_damage(amount: int) -> void:
+	if !dead:
+		animator.stop()
+		animator.play("hit")
+		health -= amount
+		_update_heart_display()
+		
+func _update_heart_display() -> void:
+	for i in range(hearts_list.size()):
+		var should_show: bool = i < health
+		if should_show == false:
+			hearts_list[i].animator.play("die")
+		else:
+			hearts_list[i].animator.play("spawn")

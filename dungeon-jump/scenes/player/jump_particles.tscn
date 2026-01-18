@@ -1,0 +1,42 @@
+[gd_scene load_steps=8 format=3 uid="uid://bjjxo3txuf4rh"]
+
+[ext_resource type="Texture2D" uid="uid://dkv6cx7rpwxp3" path="res://assets/vfx/dot.svg" id="1_q2fl6"]
+[ext_resource type="Script" uid="uid://btox2jpiikdpo" path="res://code/jump_particles.gd" id="3_4e8e4"]
+
+[sub_resource type="Curve" id="Curve_q2fl6"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_0njrb"]
+curve = SubResource("Curve_q2fl6")
+
+[sub_resource type="Curve" id="Curve_myt11"]
+_data = [Vector2(0, 1), 0.0, -1.8219671, 0, 0, Vector2(0.006419316, 1), -0.8457121, -0.8457121, 0, 0, Vector2(1, 0), -0.94825935, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_4e8e4"]
+curve = SubResource("Curve_myt11")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0njrb"]
+particle_flag_disable_z = true
+direction = Vector3(0, -1, 0)
+spread = 40.0
+initial_velocity_min = 600.0
+initial_velocity_max = 1300.0
+gravity = Vector3(0, 3000, 0)
+scale_min = 0.4
+scale_max = 0.7
+scale_curve = SubResource("CurveTexture_4e8e4")
+alpha_curve = SubResource("CurveTexture_0njrb")
+
+[node name="CPU" type="GPUParticles2D" unique_id=867610957]
+emitting = false
+amount = 5
+texture = ExtResource("1_q2fl6")
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+fixed_fps = 0
+draw_order = 0
+process_material = SubResource("ParticleProcessMaterial_0njrb")
+script = ExtResource("3_4e8e4")

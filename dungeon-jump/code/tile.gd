@@ -52,8 +52,10 @@ func _on_screen_exited() -> void:
 
 	# 2. Only delete if the tile is BELOW the player (plus a buffer of 500px)
 	# If the tile is above the player (exited the top), we KEEP it.
-	if global_position.y > spawner.player.global_position.y + screen_deletion_offset:
-		queue_free()
+	var player:= get_parent().get_node("Player")
+	if player:
+		if global_position.y > player.global_position.y:
+			queue_free()
 
 func _physics_process(delta: float) -> void:
 	# This function now ONLY runs for moving tiles.
