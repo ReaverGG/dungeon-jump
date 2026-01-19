@@ -144,6 +144,8 @@ func _handle_tile_effect(type: Tile.Type, collider: Tile) -> void:
 			take_damage(2)
 			velocity.y = -jump_force / 1.2
 			GameManager._hit_stop()
+		Tile.Type.GOLDEN:
+			heal(1)
 
 func _spawn_shockwave() -> void:
 	if not shockwave_scene: return
@@ -207,7 +209,12 @@ func take_damage(amount: int) -> void:
 		animator.play("hit")
 		health -= amount
 		_update_heart_display()
-		
+
+func heal(amount: int) -> void:
+	if !dead:
+		health += amount
+		_update_heart_display()
+	
 func _update_heart_display() -> void:
 	for i in range(hearts_list.size()):
 		hearts_list[i].should_show = i < health
