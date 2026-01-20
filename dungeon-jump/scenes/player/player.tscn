@@ -1,8 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://dvb7cmxi2ci7k"]
+[gd_scene format=3 uid="uid://dvb7cmxi2ci7k"]
 
 [ext_resource type="Script" uid="uid://hv6kctmulsg1" path="res://code/player.gd" id="1_dovo2"]
-[ext_resource type="Texture2D" uid="uid://bp3m2l5ocdag7" path="res://assets/characters/default.png" id="2_dovo2"]
 [ext_resource type="Shader" uid="uid://cuqg442fw5h44" path="res://code/shaders/tint_and_glow.gdshader" id="2_gmlin"]
+[ext_resource type="Texture2D" uid="uid://cgeuppry4o2mc" path="res://assets/characters/slime.png" id="3_gmlin"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dovo2"]
 size = Vector2(90, 103)
@@ -53,11 +53,12 @@ _data = {
 &"hit": SubResource("Animation_75vfm")
 }
 
-[node name="Player" type="CharacterBody2D" unique_id=248425265 node_paths=PackedStringArray("sprite", "animator")]
+[node name="Player" type="CharacterBody2D" unique_id=248425265 node_paths=PackedStringArray("sprite", "animator", "collision_shape")]
 platform_on_leave = 2
 script = ExtResource("1_dovo2")
 sprite = NodePath("Sprite")
 animator = NodePath("Animator")
+collision_shape = NodePath("Collider")
 
 [node name="Collider" type="CollisionShape2D" parent="." unique_id=495147889]
 position = Vector2(0, 13.5)
@@ -65,12 +66,10 @@ shape = SubResource("RectangleShape2D_dovo2")
 
 [node name="Sprite" type="Sprite2D" parent="." unique_id=896487993]
 material = SubResource("ShaderMaterial_lvxji")
-texture = ExtResource("2_dovo2")
+texture = ExtResource("3_gmlin")
 
 [node name="JumpParticles" type="Marker2D" parent="." unique_id=1026394144]
 position = Vector2(0, 65)
 
 [node name="Animator" type="AnimationPlayer" parent="." unique_id=1781039345]
-libraries = {
-&"": SubResource("AnimationLibrary_0owmy")
-}
+libraries/ = SubResource("AnimationLibrary_0owmy")

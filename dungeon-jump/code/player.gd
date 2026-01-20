@@ -7,6 +7,7 @@ extends CharacterBody2D
 @export var spawner: Spawner
 @export var label: RichTextLabel
 @export var animator: AnimationPlayer
+@export var collision_shape: CollisionShape2D
 
 @export_group("Movement")
 @export var move_speed: float = 1670.0
@@ -27,7 +28,7 @@ var death_offset: float = Tile.new().screen_deletion_offset
 var dead: bool = false
 
 var _base_offset: float = 250.0
-var _base_scale: Vector2
+var _base_scale: 	 Vector2
 var _score_origin_y: float
 var _record_y: float
 var _is_locked: bool = true
@@ -42,8 +43,10 @@ var health: int = 3:
 			value = max_health
 		elif value < 0:
 			value = 0
+		if value == 0:
+			dead = true
+			die()
 		health = value
-		print(health)
 var hearts_list: Array[Control]
 
 var score: int = 0:
@@ -146,6 +149,7 @@ func _handle_tile_effect(type: Tile.Type, collider: Tile) -> void:
 			GameManager._hit_stop()
 		Tile.Type.GOLDEN:
 			heal(1)
+			collider.change_tile("normal")
 
 func _spawn_shockwave() -> void:
 	if not shockwave_scene: return
@@ -218,4 +222,15 @@ func heal(amount: int) -> void:
 func _update_heart_display() -> void:
 	for i in range(hearts_list.size()):
 		hearts_list[i].should_show = i < health
-		print(hearts_list[i].should_show)
+
+func die() -> void:
+	_is_locked = true
+	collision_shape.disabled = true
+	velocity.y = - jump_force / 1.5
+	animator.play("hit")
+	var dir: int = randf()
+	var tween: Tween = create_tween()
+	tween.tween_property(self, "rotation_degrees", 90 * dir, 1.0)
+	while global_position.y < get_viewport_transform().get_origin().y:
+		_handle_gravity(get_process_delta_time())
+		
